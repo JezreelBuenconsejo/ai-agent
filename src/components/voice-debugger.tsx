@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Play, Volume2, AlertCircle } from 'lucide-react';
-import { VoiceGenerator, CHARACTER_VOICES } from '@/lib/voice-generator';
+import { VoiceGenerator, CHARACTER_VOICES, VoiceConfig } from '@/lib/voice-generator';
 
 export function VoiceDebugger() {
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -63,7 +63,7 @@ export function VoiceDebugger() {
     }
   };
 
-  const testCharacterVoice = async (voiceConfig: any) => {
+  const testCharacterVoice = async (voiceConfig: VoiceConfig) => {
     if (!voiceGenerator || isPlaying) return;
 
     setIsPlaying(voiceConfig.name);
@@ -108,7 +108,7 @@ export function VoiceDebugger() {
             Speech API Not Supported
           </CardTitle>
           <CardDescription>
-            Your browser doesn't support the Web Speech API. Try using Chrome, Edge, or Safari.
+            Your browser doesn&apos;t support the Web Speech API. Try using Chrome, Edge, or Safari.
           </CardDescription>
         </CardHeader>
       </Card>

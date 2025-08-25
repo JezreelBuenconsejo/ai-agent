@@ -153,7 +153,6 @@ export class VoiceGenerator {
 
   // Get consistent index for character for voice assignment
   private getCharacterIndex(character: string): number {
-    const characterTypes = ['Narrator', 'Hero', 'Villain', 'Child', 'Elder'];
     
     // Try to match character type
     const lowerChar = character.toLowerCase();
@@ -298,14 +297,12 @@ export class VoiceGenerator {
     console.log(`✅ Narrator assigned: pitch=${CHARACTER_VOICES[0].pitch}, rate=${CHARACTER_VOICES[0].rate}`);
 
     // Assign voices to other characters with distinct configurations
-    let voiceIndex = 1; // Start from second voice config
     characters.forEach((character) => {
       if (character.toLowerCase() !== 'narrator') {
         const characterIndex = this.getCharacterIndex(character);
         const voiceConfig = CHARACTER_VOICES[characterIndex % CHARACTER_VOICES.length];
         voiceMap.set(character, voiceConfig);
         console.log(`✅ ${character} assigned voice config: pitch=${voiceConfig.pitch}, rate=${voiceConfig.rate}`);
-        voiceIndex++;
       }
     });
 

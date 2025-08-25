@@ -137,13 +137,10 @@ export class AIVoiceGenerator {
         }
       }
 
-      // Combine all audio segments into one MP3
-      const combinedMp3 = this.combineAudioSegments(this.audioSegments);
-
       console.log('🎉 AI audiobook generation complete!');
       return {
         segments: this.audioSegments,
-        combinedMp3
+        combinedMp3: '' // Not used - real combination happens in downloadAudiobook()
       };
 
     } catch (error) {
@@ -184,13 +181,8 @@ export class AIVoiceGenerator {
     return ELEVENLABS_FREE_VOICES[Math.abs(hash) % ELEVENLABS_FREE_VOICES.length];
   }
 
-  // Combine multiple base64 MP3s (basic concatenation)
-  private combineAudioSegments(segments: AIAudioSegment[]): string {
-    // For simplicity, we'll return the first segment's audio
-    // In a real app, you'd use audio processing libraries to properly concatenate
-    const combinedData = segments.map(s => s.audioData).join('');
-    return segments[0]?.audioData || '';
-  }
+  // This function was unused - removed the call above
+  // Real audio combination happens in downloadAudiobook()
 
   // Play sequential AI audiobook
   async playAIAudiobook(segments: AIAudioSegment[]): Promise<void> {

@@ -5,11 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, BookOpen, Users, Play, Volume2, Pause, Settings, Sparkles, Zap, Download } from 'lucide-react';
+import { Loader2, BookOpen, Users, Play, Volume2, Pause, Sparkles, Zap, Download } from 'lucide-react';
 import { VoiceGenerator, AudioSegment } from '@/lib/voice-generator';
 import { AIVoiceGenerator, AIAudioSegment } from '@/lib/ai-voice-generator';
-import { VoiceDebugger } from './voice-debugger';
 
 // TypeScript interface for our story data
 interface StoryData {
@@ -40,14 +38,12 @@ export function StoryGenerator() {
   // Voice generator instances
   const voiceGeneratorRef = useRef<VoiceGenerator | null>(null);
   const aiVoiceGeneratorRef = useRef<AIVoiceGenerator | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // AI Voice generation state
   const [aiAudioData, setAiAudioData] = useState<{segments: AIAudioSegment[]; combinedMp3: string} | null>(null);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [aiProgress, setAiProgress] = useState({ current: 0, total: 0 });
   const [aiError, setAiError] = useState('');
-  const [voiceMode, setVoiceMode] = useState<'browser' | 'ai'>('browser');
 
   // Function to call our API and generate story
   const generateStory = async () => {
