@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, BookOpen, Users, Play, Volume2, Pause, Sparkles, Zap, Download } from 'lucide-react';
+import { Loader2, BookOpen, Users, Play, Volume2, Sparkles, Zap, Download, StopCircle } from 'lucide-react';
 import { VoiceGenerator, AudioSegment } from '@/lib/voice-generator';
 import { AIVoiceGenerator, AIAudioSegment } from '@/lib/ai-voice-generator';
 
@@ -32,7 +32,7 @@ export function StoryGenerator() {
   // Voice generation state
   const [audioData, setAudioData] = useState<AudioData | null>(null);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isBrowserPlaying, setIsBrowserPlaying] = useState(false);
   const [audioError, setAudioError] = useState('');
   
   // Voice generator instances
@@ -42,6 +42,7 @@ export function StoryGenerator() {
   // AI Voice generation state
   const [aiAudioData, setAiAudioData] = useState<{segments: AIAudioSegment[]; combinedMp3: string} | null>(null);
   const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+  const [isAIPlaying, setIsAIPlaying] = useState(false);
   const [aiProgress, setAiProgress] = useState({ current: 0, total: 0 });
   const [aiError, setAiError] = useState('');
 
@@ -168,17 +169,17 @@ export function StoryGenerator() {
   const toggleAudio = async () => {
     if (!audioData || !voiceGeneratorRef.current) return;
 
-    if (isPlaying) {
+    if (isBrowserPlaying) {
       voiceGeneratorRef.current.stopAudiobook();
-      setIsPlaying(false);
+      setIsBrowserPlaying(false);
     } else {
-      setIsPlaying(true);
+      setIsBrowserPlaying(true);
       try {
         await voiceGeneratorRef.current.playAudiobook(audioData.segments);
-        setIsPlaying(false);
+        setIsBrowserPlaying(false);
       } catch (error) {
         console.error('Playback error:', error);
-        setIsPlaying(false);
+        setIsBrowserPlaying(false);
       }
     }
   };
@@ -187,17 +188,17 @@ export function StoryGenerator() {
   const toggleAIAudio = async () => {
     if (!aiAudioData || !aiVoiceGeneratorRef.current) return;
 
-    if (isPlaying) {
-      // Stop current playback (we'll add proper stop functionality)
-      setIsPlaying(false);
+    if (isAIPlaying) {
+      aiVoiceGeneratorRef.current.stopAIAudiobook();
+      setIsAIPlaying(false);
     } else {
-      setIsPlaying(true);
+      setIsAIPlaying(true);
       try {
         await aiVoiceGeneratorRef.current.playAIAudiobook(aiAudioData.segments);
-        setIsPlaying(false);
+        setIsAIPlaying(false);
       } catch (error) {
         console.error('AI playback error:', error);
-        setIsPlaying(false);
+        setIsAIPlaying(false);
       }
     }
   };
@@ -350,8 +351,8 @@ export function StoryGenerator() {
                     
                     {audioData && (
                       <Button onClick={toggleAudio} variant="outline" size="sm">
-                        {isPlaying ? <Pause className="h-4 w-4 mr-1" /> : <Play className="h-4 w-4 mr-1" />}
-                        {isPlaying ? 'Pause' : 'Play'}
+                        {isBrowserPlaying ? <StopCircle className="h-4 w-4 mr-1" /> : <Play className="h-4 w-4 mr-1" />}
+                        {isBrowserPlaying ? 'Stop' : 'Play'}
                       </Button>
                     )}
                   </div>
@@ -402,8 +403,8 @@ export function StoryGenerator() {
                     {aiAudioData && (
                       <>
                         <Button onClick={toggleAIAudio} variant="outline" size="sm">
-                          {isPlaying ? <Pause className="h-4 w-4 mr-1" /> : <Play className="h-4 w-4 mr-1" />}
-                          {isPlaying ? 'Pause' : 'Play'}
+                          {isAIPlaying ? <StopCircle className="h-4 w-4 mr-1" /> : <Play className="h-4 w-4 mr-1" />}
+                          {isAIPlaying ? 'Stop' : 'Play'}
                         </Button>
                         <Button onClick={downloadAIAudio} variant="outline" size="sm">
                           <Download className="h-4 w-4 mr-1" />

@@ -52,6 +52,8 @@ export const ELEVENLABS_FREE_VOICES: AIVoiceConfig[] = [
 export class AIVoiceGenerator {
   private audioSegments: AIAudioSegment[] = [];
   private isGenerating: boolean = false;
+  private currentAudio: HTMLAudioElement | null = null;
+  private playbackStopped: boolean = false;
 
   // Generate AI voice for a single text segment
   async generateAIVoice(text: string, character: string): Promise<AIAudioSegment> {
@@ -186,36 +188,55 @@ export class AIVoiceGenerator {
 
   // Play sequential AI audiobook
   async playAIAudiobook(segments: AIAudioSegment[]): Promise<void> {
+    this.playbackStopped = false;
+    
     return new Promise((resolve) => {
       let currentIndex = 0;
       
       const playNext = () => {
-        if (currentIndex >= segments.length) {
+        // Check if playback was stopped
+        if (this.playbackStopped || currentIndex >= segments.length) {
+          this.currentAudio = null;
           resolve();
           return;
         }
         
         const segment = segments[currentIndex];
-        const audio = new Audio(segment.audioUrl);
+        this.currentAudio = new Audio(segment.audioUrl);
         
-        audio.onended = () => {
-          currentIndex++;
-          // Small pause between segments
-          setTimeout(playNext, 500);
+        this.currentAudio.onended = () => {
+          if (!this.playbackStopped) {
+            currentIndex++;
+            // Small pause between segments
+            setTimeout(playNext, 500);
+          }
         };
         
-        audio.onerror = () => {
+        this.currentAudio.onerror = () => {
           console.error(`Audio playback error for segment ${currentIndex}`);
-          currentIndex++;
-          setTimeout(playNext, 100);
+          if (!this.playbackStopped) {
+            currentIndex++;
+            setTimeout(playNext, 100);
+          }
         };
         
         console.log(`🔊 Playing AI voice ${currentIndex + 1}/${segments.length}: ${segment.character}`);
-        audio.play();
+        this.currentAudio.play();
       };
       
       playNext();
     });
+  }
+
+  // Stop AI audiobook playback
+  stopAIAudiobook(): void {
+    this.playbackStopped = true;
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+      this.currentAudio = null;
+    }
+    console.log('⏹️ AI audiobook playback stopped');
   }
 
   // Download complete audiobook (all segments combined)

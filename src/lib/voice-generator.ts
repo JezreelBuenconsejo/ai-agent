@@ -66,6 +66,7 @@ export const CHARACTER_VOICES: VoiceConfig[] = [
 export class VoiceGenerator {
   private synthesis: SpeechSynthesis;
   private availableVoices: SpeechSynthesisVoice[] = [];
+  private playbackStopped: boolean = false;
 
   constructor() {
     // Check if browser supports Web Speech API
@@ -359,11 +360,13 @@ export class VoiceGenerator {
 
   // Sequential playback of all segments
   async playAudiobook(segments: AudioSegment[]): Promise<void> {
+    this.playbackStopped = false;
+    
     return new Promise((resolve) => {
       let currentIndex = 0;
       
       const playNext = () => {
-        if (currentIndex >= segments.length) {
+        if (this.playbackStopped || currentIndex >= segments.length) {
           resolve();
           return;
         }
@@ -372,14 +375,18 @@ export class VoiceGenerator {
         const utterance = segment.utterance;
         
         utterance.onend = () => {
-          currentIndex++;
-          // Small pause between segments
-          setTimeout(playNext, 300);
+          if (!this.playbackStopped) {
+            currentIndex++;
+            // Small pause between segments
+            setTimeout(playNext, 300);
+          }
         };
         
         utterance.onerror = () => {
-          currentIndex++;
-          setTimeout(playNext, 100);
+          if (!this.playbackStopped) {
+            currentIndex++;
+            setTimeout(playNext, 100);
+          }
         };
         
         console.log(`🔊 Playing segment ${currentIndex + 1}/${segments.length}: ${segment.character}`);
@@ -392,7 +399,9 @@ export class VoiceGenerator {
 
   // Stop current playback
   stopAudiobook(): void {
+    this.playbackStopped = true;
     this.synthesis.cancel();
+    console.log('⏹️ Browser audiobook playback stopped');
   }
 
   // Get list of available voices for UI
